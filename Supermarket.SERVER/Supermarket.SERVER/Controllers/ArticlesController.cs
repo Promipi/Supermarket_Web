@@ -11,17 +11,16 @@ namespace Supermarket.SERVER.Controllers
     [ApiController]
     [Route("api/[controller]")]
     public class ArticlesController : Controller
-    {
-        
-        [HttpPost("add")]
-        public IActionResult InsertArticle(Article newArticle) //para introducir un nuevo articulo
-        {
-            return Ok(ArticlesRepository.InsertArticle(newArticle));
-        }
+    {    
         [HttpGet]
         public IActionResult GetAllArticles()
         {
             return Ok(ArticlesRepository.GetAllArticles() );
+        }
+        [HttpPost("add")]
+        public IActionResult InsertArticle(Article newArticle) //para introducir un nuevo articulo
+        {
+            return Ok(ArticlesRepository.InsertArticle(newArticle));
         }
         [HttpPut]
         public IActionResult UpdateArticle(Article article) //api/articles
