@@ -13,25 +13,33 @@ namespace Supermarket.SERVER.Controllers
     public class ClientsController : Controller
     {
         [HttpGet]
-        public IActionResult GetAllClients()
+        public IActionResult GetAllClients()            //obtener todos los clientes
         {
-            return Ok(ClientsRepository.GetAllClients()); //retornamos un 200 con la lista de clientes
+            var response = ClientsRepository.GetAllClients(); //obtenems la respuesta de nuestra consulta
+            if(response.Sucess) return Ok(response);          //si no hubo errores
+            else                return Problem(response.Message); 
         }
 
         [HttpPost("add")]
-        public IActionResult InsertClient(Client newClient)
+        public IActionResult InsertClient(Client newClient) //insertar un cliente
         {
-            return Ok(ClientsRepository.InsertClient(newClient));
+            var response = ClientsRepository.InsertClient(newClient); //obtenems la respuesta de nuestra consulta 
+            if (response.Sucess) return Ok(response);                 //si no hubo errores
+            else                return Problem(response.Message);
         }
         [HttpPut]
-        public IActionResult UpdateClient(Client client) //para actualziar un ciente
+        public IActionResult UpdateClient(Client client) //para actualizar un cliente
         {
-            return Ok(ClientsRepository.UpdateClient(client));
+            var response = ClientsRepository.UpdateClient(client); //obtenems la respuesta de nuestra consulta 
+            if (response.Sucess) return Ok(response);              //si no hubo errores
+            else                 return Problem(response.Message);
         }
         [HttpDelete]
         public IActionResult DeleteClient(int id)
         {
-            return Ok(ClientsRepository.DeleteClient(id));  //para eliminar un cliente
+            var response = ClientsRepository.DeleteClient(id); //obtenems la respuesta de nuestra consulta 
+            if (response.Sucess) return Ok(response);              //si no hubo errores
+            else return Problem(response.Message);
         }
     }
 }

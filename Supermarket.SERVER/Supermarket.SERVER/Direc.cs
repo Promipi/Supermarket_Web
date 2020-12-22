@@ -7,6 +7,8 @@ namespace Supermarket.SERVER
 {
     public static class Direc
     {
-        public const string SqlConnection = "Data Source =DESKTOP-08RDRIQ\\GESTIONPROMIPI; Initial Catalog = Supermarket_Web; Persist Security Info = True; User ID = sa; Password = 750timalta";
+        public const string SqlConnection = "Data Source =PROMIPC\\GESTIONPROMIPI; Initial Catalog = Supermarket_Web; Persist Security Info = True; User ID = sa; Password = 750timalta";
+        
     }
+    
 }

@@ -5,41 +5,84 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using Supermarket.SERVER.Data;
 
 namespace Supermarket.SERVER.Respositories
 {
     public static class ClientsRepository
     {
         static SqlConnection sqlConnection = new SqlConnection(Direc.SqlConnection);
-        public static List<Client> GetAllClients()
+        private const string sucess = "Peticion realizada con Exito!";
+
+        public static Response<Client> GetAllClients()
         {
+            var response = new Response<Client>();
             string query = "SELECT * FROM [dbo].[Clients] ";
-            return sqlConnection.Query<Client>(query).ToList(); //retornamos la lista de clientes
+            try
+            {
+                response.Content = sqlConnection.Query<Client>(query).ToList(); //retornamos la lista de clientes
+                response.Sucess = true; response.Message = sucess;
+            }
+            catch(Exception ex)
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
+            
         }
-        public static bool InsertClient(Client newClient)
+        public static Response<Client> InsertClient(Client newClient)
         {
+            var response = new Response<Client>();
             string query = string.Format("INSERT INTO [dbo].[Clients] VALUES ('{0}','{1}','{2}','{3}','{4}') ",
                 newClient.Ruc, newClient.Name, newClient.Gmail, newClient.PhoneNumber, newClient.Age);
-            //creamos la consulta para introducir el nuevo cliente
-            int result = sqlConnection.Execute(query);
-            if (result > 0) return true ;
-            else            return false;
-        }
-        public static bool DeleteClient(int id)
-        {
-            string query = string.Format("DELETE FROM [dbo].[Clients] WHERE Id = {0} ", id);
-            sqlConnection.Execute(query); //ejecutamos el comando para elimnar un cleinte
-            return true;
+            //creamos la query para introducir un nuevo cliente a la base de datos
+            try
+            {
+                sqlConnection.ExecuteAsync(query); 
+                response.Sucess = true; response.Message = sucess;
+            }   
+            catch(Exception ex)
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
         }
 
-        public static bool UpdateClient(Client client)
+        public static Response<Client> DeleteClient(int id)
         {
-            using (var db = new Supermarket_DbContext())
+            var response = new Response<Client>();
+            string query = string.Format("DELETE FROM [dbo].[Clients] WHERE Id = {0} ", id); //query para eliminar un cliente
+            try
             {
-                db.Clients.Update(client);
-                db.SaveChanges();
-                return true;
+                sqlConnection.ExecuteAsync(query);
+                response.Sucess = true; response.Message = sucess;
             }
+            catch (Exception ex)
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
         }
+
+        public static Response<Client> UpdateClient(Client client)
+        {
+            var response = new Response<Client>();
+            try
+            {
+                using (var db = new Supermarket_DbContext())
+                {
+                    db.Clients.Update(client);
+                    db.SaveChanges();
+                    response.Sucess = true; response.Message = sucess;
+                }
+            }
+            catch(Exception ex)
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
+        }
+
+    }
     }
 }

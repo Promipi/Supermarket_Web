@@ -15,22 +15,30 @@ namespace Supermarket.SERVER.Controllers
         [HttpGet]
         public IActionResult GetAllArticles()
         {
-            return Ok(ArticlesRepository.GetAllArticles() );
+            var response = ArticlesRepository.GetAllArticles(); //obtenemos todos los articulos
+            if (response.Sucess) return Ok(response);
+            else                 return Problem(response.Message); //si ocurrio un error
         }
         [HttpPost("add")]
         public IActionResult InsertArticle(Article newArticle) //para introducir un nuevo articulo
         {
-            return Ok(ArticlesRepository.InsertArticle(newArticle));
+            var response = ArticlesRepository.InsertArticle(newArticle);
+            if (response.Sucess) return Ok(response);
+            else                 return Problem(response.Message);
         }
         [HttpPut]
         public IActionResult UpdateArticle(Article article) //api/articles
         {
-            return Ok(ArticlesRepository.UpdateArticle(article));  //actualizamos el articulo
+            var response = ArticlesRepository.UpdateArticle(article);
+            if (response.Sucess) return Ok(response);
+            else                 return Problem(response.Message);
         }
         [HttpDelete]
         public IActionResult DeleteArticle(int id)
         {
-            return Ok(ArticlesRepository.DeleteArticle(id)); //eliminamos el articulo
+            var response = ArticlesRepository.DeleteArticle(id); //eliminamos el articulo mediante su id
+            if (response.Sucess) return Ok(response);
+            else                 return Problem(response.Message);
         }
          
     }

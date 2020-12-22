@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Programacion_General\\Proyectos de programacion\\SuperMarket_Web\\SuperMarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj": {}
+    "G:\\Programacion_General\\Proyectos de programacion\\Supermarket_Web\\Supermarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj": {}
   },
   "projects": {
-    "E:\\Programacion_General\\Proyectos de programacion\\SuperMarket_Web\\SuperMarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj": {
+    "G:\\Programacion_General\\Proyectos de programacion\\Supermarket_Web\\Supermarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Programacion_General\\Proyectos de programacion\\SuperMarket_Web\\SuperMarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj",
+        "projectUniqueName": "G:\\Programacion_General\\Proyectos de programacion\\Supermarket_Web\\Supermarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj",
         "projectName": "Supermarket.SERVER",
-        "projectPath": "E:\\Programacion_General\\Proyectos de programacion\\SuperMarket_Web\\SuperMarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj",
-        "packagesPath": "C:\\Users\\data\\.nuget\\packages\\",
-        "outputPath": "E:\\Programacion_General\\Proyectos de programacion\\SuperMarket_Web\\SuperMarket.SERVER\\Supermarket.SERVER\\obj\\",
+        "projectPath": "G:\\Programacion_General\\Proyectos de programacion\\Supermarket_Web\\Supermarket.SERVER\\Supermarket.SERVER\\Supermarket.SERVER.csproj",
+        "packagesPath": "C:\\Users\\Promipi\\.nuget\\packages\\",
+        "outputPath": "G:\\Programacion_General\\Proyectos de programacion\\Supermarket_Web\\Supermarket.SERVER\\Supermarket.SERVER\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\data\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Promipi\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,6 +22,8 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\Promipi\\.nuget\\packages": {},
+          "http://nuget.emzi0767.com/api/v3/index.json": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -105,7 +107,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }
