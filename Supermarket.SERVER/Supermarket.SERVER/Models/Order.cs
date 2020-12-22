@@ -13,9 +13,11 @@ Total float,*/
         public int Id { get; set; }
         public int ClientId { get; set; }
 
-        public DateTime? DateMade { get; set; }
+        public DateTime DateMade { get; set; }
 
         public float Total { get; set; }
+
+        public string PaymentMethod { get; set; } //el metodo de pago
 
         public Client ClientNavigation { get; set; }
         public List<Purchase> Purchases {get;set;} //e; conjunto de compras del pedido

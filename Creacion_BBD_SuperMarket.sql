@@ -25,6 +25,7 @@ Id int identity,
 ClientId int,
 DateMade datetime,
 Total float,
+PaymenthMethod varchar(100)
 constraint Pk_Orders primary key(Id),
 constraint Fk_Orders_Clients foreign key(ClientId) references Clients(Id)
 )

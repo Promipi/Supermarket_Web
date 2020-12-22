@@ -33,12 +33,11 @@ namespace Supermarket.SERVER.Respositories
         public static Response<Client> InsertClient(Client newClient)
         {
             var response = new Response<Client>();
-            string query = string.Format("INSERT INTO [dbo].[Clients] VALUES ('{0}','{1}','{2}','{3}','{4}') ",
-                newClient.Ruc, newClient.Name, newClient.Gmail, newClient.PhoneNumber, newClient.Age);
+            string query = "INSERT INTO [dbo].[Clients] VALUES (@Ruc,@Name,@Gmail,@PhoneNumber,@Age) ";
             //creamos la query para introducir un nuevo cliente a la base de datos
             try
             {
-                sqlConnection.ExecuteAsync(query); 
+                sqlConnection.ExecuteAsync(query,newClient); //inseramos el nuevo cliente 
                 response.Sucess = true; response.Message = sucess;
             }   
             catch(Exception ex)
@@ -84,5 +83,5 @@ namespace Supermarket.SERVER.Respositories
         }
 
     }
-    }
+    
 }

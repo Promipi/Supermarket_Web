@@ -21,8 +21,7 @@ namespace Supermarket.SERVER.Respositories
             string query = "INSERT INTO [dbo].[Articles] VALUES (@Family,@Description,@Price)";
             try
             {
-                var result = sqlConnection.Execute(query,
-                new Article { Family = newArticle.Family, Description = newArticle.Description, Price = newArticle.Price });
+                var result = sqlConnection.Execute(query,newArticle); //insertamos el nuevo articulo a la base de datos    
                 //Ejecutamos la consulta 
 
                 response.Sucess = true; response.Message = sucess;
