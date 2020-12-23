@@ -1,0 +1,89 @@
+﻿@page "/orderForm"
+@page "/orderForm/{id:int}"
+@inject RestClient RestClient
+@inject HttpClient HttpClient
+
+<h3>Pedido Form</h3>
+
+<table class="table" border="1">
+    <tr>
+       
+        <td>
+            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
+                <InputText @bind-Value="codeArticle"> </InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
+                <InputText @bind-Value="descriptionArticle"> </InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
+                <InputText @bind-Value="units"> </InputText>
+            </EditForm>
+        </td>
+        <td>
+            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
+                <InputText @bind-Value="subTotal"> </InputText>
+            </EditForm>
+        </td>    
+    </tr>
+
+    <tr>
+        <td style="background-color:dodgerblue"><b>Codigo</b></td>
+        <td style="background-color:dodgerblue"><b>Nombre</b></td>
+        <td style="background-color:dodgerblue"><b>Precio</b></td>
+        <td style="background-color:dodgerblue"><b>Unidades</b></td>
+        <td style="background-color:dodgerblue"><b>Subtotal</b></td>
+    </tr>
+
+    @foreach (var purchase in Purchases)
+    {
+        @if (purchase.ArticleNavigation != null)
+        {
+            <tr>
+                <td>@purchase.ArticleNavigation.Code</td>
+                <td>@purchase.ArticleNavigation.Description</td>
+                <td>@purchase.ArticleNavigation.Price</td>
+                <td>@purchase.Units</td>
+                <td>@purchase.SubTotal</td>
+                <td>
+                    <a class="btn btn-success">Editar</a>
+                    <a class="btn btn-danger">Eliminar</a>
+                </td>
+
+            </tr>
+        }
+
+    }
+</table>
+
+
+
+
+@code {
+    List<Purchase> Purchases = new List<Purchase>(); //la lista de compras que tendra el pedido
+    [Parameter] public int id { get; set; }
+
+    public string codeArticle;
+    public string descriptionArticle;
+    public string units; //las unidades
+    public string subTotal;
+
+    public async void InsertPurchase() //para introducir una compra
+    {
+       
+    }
+
+    protected async override Task OnInitializedAsync()
+    {
+        if(id!=0) //si es que seleccionamos un pedid
+        {
+            string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
+            RestRequest request = new RestRequest(getPurchasesByOrder, Method.GET);
+            var response = RestClient.Execute(request);//ejecutamos la peticion para obtener las compras del pedido
+            Purchases = JsonConvert.DeserializeObject<Response<Purchase>>(response.Content).Content;
+        }
+    }
+}

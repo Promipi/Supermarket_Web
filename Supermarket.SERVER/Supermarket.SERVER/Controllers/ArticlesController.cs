@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Supermarket.SERVER.Data;
 using Supermarket.SERVER.Models;
 using Supermarket.SERVER.Respositories;
 using System;
@@ -13,9 +14,14 @@ namespace Supermarket.SERVER.Controllers
     public class ArticlesController : Controller
     {    
         [HttpGet]
-        public IActionResult GetAllArticles()
+        public IActionResult GetAllArticles(int? id)
         {
-            var response = ArticlesRepository.GetAllArticles(); //obtenemos todos los articulos
+            Response<Article> response = new Response<Article>();
+            if(id==null) response = ArticlesRepository.GetAllArticles(); //obtenemos todos los articulos
+            else         response = ArticlesRepository.GetArticleById(id); //obtenemos un articulo
+
+
+
             if (response.Sucess) return Ok(response);
             else                 return Problem(response.Message); //si ocurrio un error
         }

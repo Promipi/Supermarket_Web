@@ -1,0 +1,46 @@
+﻿
+@page "/articlesList"
+@inject RestClient RestClient
+
+<h1>Lista De Articulos</h1>
+
+    @if (Articles.Count() != 0)
+    {
+        <table class="table" border="1">
+            <tr>
+                <td style="background-color:dodgerblue"><b>Familia</b></td>
+                <td style="background-color:dodgerblue"><b>Descripcion</b></td>
+                <td style="background-color:dodgerblue"><b>Precio</b></td>
+            </tr>
+            @foreach (var article in Articles)
+            {
+                <tr>
+                    <td>@article.Family</td>
+                    <td>@article.Description</td>
+                    <td>@article.Price</td>
+                    <td>
+                        <a class="btn btn-success">Editar</a>
+                        <a class="btn btn-danger">Eliminar</a>
+                    </td>
+   
+                </tr>
+            }
+        </table>
+
+
+    }
+
+
+
+@code
+{
+
+    List<Article> Articles { get; set; } = new List<Article>();
+    protected async override Task OnInitializedAsync()
+    {
+        string getAllArticles = "/api/Articles";
+        RestRequest request = new RestRequest(getAllArticles, Method.GET); //creamos la peticion para obtener los articulos
+        var response = RestClient.Execute(request); //ejecutamos la peticion
+        Articles = JsonConvert.DeserializeObject<Response<Article>>(response.Content).Content; //obtenemos la lista de articulos de nuestra petcion
+    }
+}

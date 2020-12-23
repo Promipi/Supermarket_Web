@@ -1,0 +1,41 @@
+﻿@page "/orderList"
+@inject RestClient RestClient
+<h3>Lista De Pedidos</h3>
+
+@if(Orders.Count() != 0)
+{
+    <table class="table" border="1">
+        <tr>
+            <td style="background-color:dodgerblue"><b>Id</b></td>
+            <td style="background-color:dodgerblue"><b>Fecha</b></td>
+            <td style="background-color:dodgerblue"><b>Metodo Pago</b></td>
+            <td style="background-color:dodgerblue"><b>Costo Total</b></td>
+        </tr>
+        @foreach (var order in Orders)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.DateMade</td>
+                <td>@order.PaymentMethod</td>
+                <td>@order.Total</td>
+                <td>
+                    <a class="btn btn-success" href="/orderForm/@order.Id">Seleccionar</a>
+                    <a class="btn btn-danger">Eliminar</a>
+                </td>
+
+            </tr>
+        }
+    </table>
+}
+
+@code {     
+    List<Order> Orders = new List<Order>();
+    protected async override Task OnInitializedAsync()
+    {
+        string getAllOrders = "/api/Orders";
+        RestRequest request = new RestRequest(getAllOrders, Method.GET);
+        var response = RestClient.Execute(request); //obtenemos la respuesta de nuestra peticion
+        Orders = JsonConvert.DeserializeObject<Response<Order>>(response.Content).Content; //obtenemos la lista de orders
+
+    }
+}

@@ -1,0 +1,9 @@
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\bin\Debug\netstandard2.0\Supermarket.SHARED.deps.json
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\bin\Debug\netstandard2.0\Supermarket.SHARED.dll
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\bin\Debug\netstandard2.0\Supermarket.SHARED.pdb
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\obj\Debug\netstandard2.0\Supermarket.SHARED.csprojAssemblyReference.cache
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\obj\Debug\netstandard2.0\Supermarket.SHARED.AssemblyInfoInputs.cache
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\obj\Debug\netstandard2.0\Supermarket.SHARED.AssemblyInfo.cs
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\obj\Debug\netstandard2.0\Supermarket.SHARED.csproj.CoreCompileInputs.cache
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\obj\Debug\netstandard2.0\Supermarket.SHARED.dll
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.SHARED\obj\Debug\netstandard2.0\Supermarket.SHARED.pdb

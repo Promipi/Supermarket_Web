@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Supermarket.SERVER.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class OrdersController : Controller
     {
         [HttpGet]

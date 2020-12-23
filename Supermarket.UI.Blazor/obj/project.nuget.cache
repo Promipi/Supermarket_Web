@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "iuC4zUfrdDnPR/ySn+tyndV6BjMUu2i3hQQ/bhjtTG1r+68yXt2kgBnzmpjJiktTmsDjXCSct9ga7O5T5QIqFg==",
+  "success": true,
+  "projectFilePath": "G:\\Programacion_General\\Proyectos de programacion\\Supermarket_Web\\Supermarket.UI.Blazor\\Supermarket.UI.Blazor.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Promipi\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512",
+    "C:\\Users\\Promipi\\.nuget\\packages\\restsharp\\106.11.8-alpha.0.12\\restsharp.106.11.8-alpha.0.12.nupkg.sha512",
+    "C:\\Users\\Promipi\\.nuget\\packages\\system.net.http.json\\5.0.0\\system.net.http.json.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -50,6 +50,22 @@ namespace Supermarket.SERVER.Respositories
             }
             return response;
         }
+        public static Response<Article> GetArticleById(int? id) //obtener un  ariculo mediante su id
+        {
+            var response = new Response<Article>();
+            string query = string.Format("SELECT * FROM [dbo].[Articles] WHERE Id = {0} ",id);
+            try
+            {
+                response.Content = sqlConnection.Query<Article>(query).ToList(); //obtenemos el articulo con el id especifico
+
+                response.Sucess = true; response.Message = sucess;
+            }
+            catch(Exception ex)
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
+        }
 
         public static Response<Article> UpdateArticle(Article article)
         {

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "rPnKi86yNlhKLSsbJMj6Y5/VKZ928sZ0ANDSTvkXz9WpwuTkvijSftacyOPjeWVFpNbpEn0g3Te9vXk6S9ToYQ==",
+  "success": true,
+  "projectFilePath": "G:\\Programacion_General\\Proyectos de programacion\\Supermarket_Web\\Supermarket.SHARED\\Supermarket.SHARED.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Promipi\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\Promipi\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
