@@ -14,11 +14,12 @@ namespace Supermarket.SERVER.Controllers
     public class ArticlesController : Controller
     {    
         [HttpGet]
-        public IActionResult GetAllArticles(int? id)
+        public IActionResult GetAllArticles(int? id,int? code)
         {
             Response<Article> response = new Response<Article>();
-            if(id==null) response = ArticlesRepository.GetAllArticles(); //obtenemos todos los articulos
-            else         response = ArticlesRepository.GetArticleById(id); //obtenemos un articulo
+            if(id!=null)    response = ArticlesRepository.GetArticleById(id); //obtenemos un articulo  mediante su id
+            if(code!=null)  response = ArticlesRepository.GetArticleByCode(code); //obtenemos un articulo mediante su codigo
+            else            response = ArticlesRepository.GetAllArticles(); //obtenemos todos los articulos    
 
 
 

@@ -5,42 +5,44 @@
 
 <h3>Pedido Form</h3>
 
-<table class="table" border="1">
-    <tr>
-       
-        <td>
-            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
-                <InputText @bind-Value="codeArticle"> </InputText>
-            </EditForm>
-        </td>
-        <td>
-            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
-                <InputText @bind-Value="descriptionArticle"> </InputText>
-            </EditForm>
-        </td>
-        <td>
-            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
-                <InputText @bind-Value="units"> </InputText>
-            </EditForm>
-        </td>
-        <td>
-            <EditForm Model="Purchases" OnInvalidSubmit="InsertPurchase">
-                <InputText @bind-Value="subTotal"> </InputText>
-            </EditForm>
-        </td>    
-    </tr>
+<div>
+    <table class="table" border="1">
+        <tr>
 
-    <tr>
-        <td style="background-color:dodgerblue"><b>Codigo</b></td>
-        <td style="background-color:dodgerblue"><b>Nombre</b></td>
-        <td style="background-color:dodgerblue"><b>Precio</b></td>
-        <td style="background-color:dodgerblue"><b>Unidades</b></td>
-        <td style="background-color:dodgerblue"><b>Subtotal</b></td>
-    </tr>
+            <td>
+                <EditForm Model="Purchases">
+                    <InputText @bind-Value="codeArticle"> </InputText>
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+                </EditForm>
+            </td>
+            <td>
+                <EditForm Model="Purchases">
+                    <InputText @bind-Value="descriptionArticle"> </InputText>
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+                </EditForm>
+            </td>
+            <td>
+            </td>
+            <td>
+                <EditForm Model="Purchases">
+                    <InputText @bind-Value="units"> </InputText>
+                    <DataAnnotationsValidator></DataAnnotationsValidator>
+                </EditForm>
+            </td>
+            <td>
+                <button class="btn btn-success" @onclick="InsertPurchase">Introducir</button>
+            </td>
+        </tr>
 
-    @foreach (var purchase in Purchases)
-    {
-        @if (purchase.ArticleNavigation != null)
+        <tr>
+            <td style="background-color:dodgerblue"><b>Codigo</b></td>
+            <td style="background-color:dodgerblue"><b>Nombre</b></td>
+            <td style="background-color:dodgerblue"><b>Precio</b></td>
+            <td style="background-color:dodgerblue"><b>Unidades</b></td>
+            <td style="background-color:dodgerblue"><b>Subtotal</b></td>
+        </tr>
+
+        @foreach (var purchase in Purchases)
         {
             <tr>
                 <td>@purchase.ArticleNavigation.Code</td>
@@ -55,12 +57,10 @@
 
             </tr>
         }
+    </table>
+</div>
 
-    }
-</table>
-
-
-
+<h3>Total:@total</h3>
 
 @code {
     List<Purchase> Purchases = new List<Purchase>(); //la lista de compras que tendra el pedido
@@ -69,11 +69,27 @@
     public string codeArticle;
     public string descriptionArticle;
     public string units; //las unidades
-    public string subTotal;
+    public float total; //el ottal que esta costando la compra
 
     public async void InsertPurchase() //para introducir una compra
     {
-       
+        string getArticlebyCode = string.Format("/api/Articles?code={0}",codeArticle);
+        var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
+        if(article != null)
+        {
+            float subTotal = int.Parse(units) * article.Price;
+
+            var newPurchase = new Purchase
+            { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId=id, ArticleNavigation=article };//creamos la nueva compra
+
+            var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
+
+            Purchases.Add(newPurchase);
+            if (response != null) total += subTotal; await InvokeAsync(StateHasChanged);
+
+            units = codeArticle = ""; //reciniamos los campos
+
+        }
     }
 
     protected async override Task OnInitializedAsync()
@@ -81,9 +97,13 @@
         if(id!=0) //si es que seleccionamos un pedid
         {
             string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
-            RestRequest request = new RestRequest(getPurchasesByOrder, Method.GET);
-            var response = RestClient.Execute(request);//ejecutamos la peticion para obtener las compras del pedido
-            Purchases = JsonConvert.DeserializeObject<Response<Purchase>>(response.Content).Content;
+            Purchases = (await HttpClient.GetFromJsonAsync<Response<Purchase>>(getPurchasesByOrder) ).Content;
+            //obtenemos la lista de compras de una orden especifica
+
+
+            if (Purchases != null) await InvokeAsync(StateHasChanged);
+            foreach(var purchase in Purchases) { total += purchase.SubTotal; } //para sumar cuando dio el total
         }
     }
+
 }

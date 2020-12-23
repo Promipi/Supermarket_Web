@@ -135,11 +135,27 @@ using System.Net.Http.Json;
     public string codeArticle;
     public string descriptionArticle;
     public string units; //las unidades
-    public string subTotal;
+    public float total; //el ottal que esta costando la compra
 
     public async void InsertPurchase() //para introducir una compra
     {
+        string getArticlebyCode = string.Format("/api/Articles?code={0}",codeArticle);
+        var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
+        if(article != null)
+        {
+            float subTotal = int.Parse(units) * article.Price;
 
+            var newPurchase = new Purchase
+            { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId=id, ArticleNavigation=article };//creamos la nueva compra
+
+            var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
+
+            Purchases.Add(newPurchase);
+            if (response != null) await InvokeAsync(StateHasChanged); total += subTotal;
+
+            units = codeArticle = ""; //reciniamos los campos
+
+        }
     }
 
     protected async override Task OnInitializedAsync()
@@ -147,11 +163,15 @@ using System.Net.Http.Json;
         if(id!=0) //si es que seleccionamos un pedid
         {
             string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
-            RestRequest request = new RestRequest(getPurchasesByOrder, Method.GET);
-            var response = RestClient.Execute(request);//ejecutamos la peticion para obtener las compras del pedido
-            Purchases = JsonConvert.DeserializeObject<Response<Purchase>>(response.Content).Content;
+            Purchases = (await HttpClient.GetFromJsonAsync<Response<Purchase>>(getPurchasesByOrder) ).Content;
+            //obtenemos la lista de compras de una orden especifica
+
+
+            if (Purchases != null) await InvokeAsync(StateHasChanged);
+            foreach(var purchase in Purchases) { total += purchase.SubTotal; } //para sumar cuando dio el total
         }
     }
+
 
 #line default
 #line hidden

@@ -35,6 +35,8 @@ namespace Supermarket.SERVER.Respositories
 
         }
 
+
+
         public static Response<Article> GetAllArticles()
         {
             var response = new Response<Article>();
@@ -66,6 +68,24 @@ namespace Supermarket.SERVER.Respositories
             }
             return response;
         }
+
+        public static Response<Article> GetArticleByCode(int? code) //obtener un  ariculo mediante su id
+        {
+            var response = new Response<Article>();
+            string query = string.Format("SELECT * FROM [dbo].[Articles] WHERE Code = {0} ", code);
+            try
+            {
+                response.Content = sqlConnection.Query<Article>(query).ToList(); //obtenemos el articulo con el id especifico
+
+                response.Sucess = true; response.Message = sucess;
+            }
+            catch (Exception ex)
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
+        }
+
 
         public static Response<Article> UpdateArticle(Article article)
         {
