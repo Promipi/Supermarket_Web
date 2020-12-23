@@ -1,5 +1,6 @@
 ﻿
 @page "/articlesList"
+@page "/articlesList/{idOrder:int}"
 @inject RestClient RestClient
 
 <h1>Lista De Articulos</h1>
@@ -19,8 +20,16 @@
                     <td>@article.Description</td>
                     <td>@article.Price</td>
                     <td>
-                        <a class="btn btn-success">Editar</a>
-                        <a class="btn btn-danger">Eliminar</a>
+                        @if (idOrder != 0)
+                        {
+                            <a href="/orderForm/@idOrder/@article.Id" class="btn" style="background-color: dodgerblue">Seleccionar</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-success">Editar</a>
+                            <a class="btn btn-danger">Eliminar</a>
+                        }
+
                     </td>
    
                 </tr>
@@ -34,7 +43,7 @@
 
 @code
 {
-
+    [Parameter] public int idOrder { get; set; }
     List<Article> Articles { get; set; } = new List<Article>();
     protected async override Task OnInitializedAsync()
     {

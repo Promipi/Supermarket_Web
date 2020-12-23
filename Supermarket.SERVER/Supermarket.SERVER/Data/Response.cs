@@ -9,8 +9,8 @@ namespace Supermarket.SERVER.Data
     {
         public bool Sucess { get; set; } //si tuvo exito 
         public string Message { get; set; }
-        
-        public List<T> Content { get; set; } //lo que tendra de contenido la respuesta que se pasara a JSON
+
+        public List<T> Content { get; set; } = new List<T>(); //lo que tendra de contenido la respuesta que se pasara a JSON
 
        
     }

@@ -118,6 +118,7 @@ using System.Net.Http.Json;
 #line hidden
 #nullable disable
     [Microsoft.AspNetCore.Components.RouteAttribute("/articlesList")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/articlesList/{idOrder:int}")]
     public partial class ArticlesList : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
@@ -126,9 +127,9 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 36 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\ArticlesList.razor"
+#line 45 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\ArticlesList.razor"
  
-
+    [Parameter] public int idOrder { get; set; }
     List<Article> Articles { get; set; } = new List<Article>();
     protected async override Task OnInitializedAsync()
     {

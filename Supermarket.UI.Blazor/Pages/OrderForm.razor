@@ -1,17 +1,35 @@
 ﻿@page "/orderForm"
 @page "/orderForm/{id:int}"
+@page "/orderForm/{id:int}/{idArticle:int}"
+@page "/orderForm/{id:int}/{idArticle:int}/{idClient:int}"
+
 @inject RestClient RestClient
 @inject HttpClient HttpClient
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
 
 <h3>Pedido Form</h3>
 
-<div>
+<a href="/articlesList/@order.Id" class="btn " style="background-color:lemonchiffon">Articulos</a>
+
+<div style="height:600px;overflow:scroll" >
     <table class="table" border="1">
+
+
+        <tr style="width:100px">
+            <td style="background-color:dodgerblue"><b>Codigo</b></td>
+            <td style="background-color:dodgerblue"><b>Nombre</b></td>
+            <td style="background-color:dodgerblue"><b>Precio</b></td>
+            <td style="background-color:dodgerblue"><b>Unidades</b></td>
+            <td style="background-color:dodgerblue"><b>Subtotal</b></td>
+            <td style="background-color:dodgerblue"><b>Opciones</b></td>
+        </tr>
+
         <tr>
 
             <td>
                 <EditForm Model="Purchases">
-                    <InputText @bind-Value="codeArticle"> </InputText>
+                    <InputText @bind-Value="codeArticle" style="width:100px"> </InputText>
                     <DataAnnotationsValidator></DataAnnotationsValidator>
                 </EditForm>
             </td>
@@ -25,85 +43,131 @@
             </td>
             <td>
                 <EditForm Model="Purchases">
-                    <InputText @bind-Value="units"> </InputText>
+                    <InputText style="width:100px " @bind-Value="units"> </InputText>
                     <DataAnnotationsValidator></DataAnnotationsValidator>
                 </EditForm>
             </td>
             <td>
                 <button class="btn btn-success" @onclick="InsertPurchase">Introducir</button>
             </td>
+            <td></td>
         </tr>
-
-        <tr>
-            <td style="background-color:dodgerblue"><b>Codigo</b></td>
-            <td style="background-color:dodgerblue"><b>Nombre</b></td>
-            <td style="background-color:dodgerblue"><b>Precio</b></td>
-            <td style="background-color:dodgerblue"><b>Unidades</b></td>
-            <td style="background-color:dodgerblue"><b>Subtotal</b></td>
-        </tr>
-
-        @foreach (var purchase in Purchases)
+        @if (Purchases != null)
         {
-            <tr>
-                <td>@purchase.ArticleNavigation.Code</td>
-                <td>@purchase.ArticleNavigation.Description</td>
-                <td>@purchase.ArticleNavigation.Price</td>
-                <td>@purchase.Units</td>
-                <td>@purchase.SubTotal</td>
-                <td>
-                    <a class="btn btn-success">Editar</a>
-                    <a class="btn btn-danger">Eliminar</a>
-                </td>
+            @foreach (var purchase in Purchases)
+            {
+                <tr>
+                    <td>@purchase.ArticleNavigation.Code</td>
+                    <td>@purchase.ArticleNavigation.Description</td>
+                    <td>@purchase.ArticleNavigation.Price</td>
+                    <td>@purchase.Units</td>
+                    <td>@purchase.SubTotal</td>
+                    <td>
+                        <a class="btn btn-success">Editar</a>
+                        <a class="btn btn-danger" @onclick="@(() => DeletePurchase(purchase.Id) )">Eliminar</a>
+                    </td>
 
-            </tr>
+                </tr>
+            }
         }
+
     </table>
+
 </div>
 
-<h3>Total:@total</h3>
+<h3 style="text-align:end">Total:@order.Total</h3>
+<button @onclick="SendOrder" class="btn btn-success">Facturar</button>
 
 @code {
     List<Purchase> Purchases = new List<Purchase>(); //la lista de compras que tendra el pedido
     [Parameter] public int id { get; set; }
+    [Parameter] public int idArticle { get; set; }
+    [Parameter] public int idClient { get; set; }
 
-    public string codeArticle;
-    public string descriptionArticle;
-    public string units; //las unidades
-    public float total; //el ottal que esta costando la compra
+    public string codeArticle = "";
+    public string descriptionArticle = "";
+    public string units = ""; //las unidades
+    public Order order { get; set; } = new Order();
 
     public async void InsertPurchase() //para introducir una compra
     {
-        string getArticlebyCode = string.Format("/api/Articles?code={0}",codeArticle);
-        var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
-        if(article != null)
+        if (units == "")
+            await JS.InvokeVoidAsync("alert", "Debe Rellenar Las Unidades");
+        else
         {
-            float subTotal = int.Parse(units) * article.Price;
+            string getArticlebyCode = string.Format("/api/Articles?code={0}", codeArticle);
+            var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
+            if (article != null)
+            {
+                float subTotal = int.Parse(units) * article.Price;
 
-            var newPurchase = new Purchase
-            { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId=id, ArticleNavigation=article };//creamos la nueva compra
+                var newPurchase = new Purchase
+                { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId = order.Id, ArticleNavigation = article };//creamos la nueva compra
 
-            var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
+                var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
 
-            Purchases.Add(newPurchase);
-            if (response != null) total += subTotal; await InvokeAsync(StateHasChanged);
+                Purchases.Add(newPurchase);
+                if (response != null) order.Total += subTotal; await InvokeAsync(StateHasChanged);
 
-            units = codeArticle = ""; //reciniamos los campos
+                units = codeArticle = ""; //reciniamos los campos
 
+            }
         }
+
+
+    }
+
+    public async void SendOrder()
+    {
+        order.DateMade = DateTime.Now; order.ClientId = 1; //establecmeos sus propiedades
+        var response = await HttpClient.PutAsJsonAsync<Order>("/api/Orders", order); //actualizamos el pedido
+        Navigation.NavigateTo("/");
+    }
+    public async void DeletePurchase(int idPurchase) //eliminar una compra
+    {
+        string deletePurchaseById = $"/api/Purchases?id={idPurchase}";
+        var response = await HttpClient.DeleteAsync(deletePurchaseById); //eliminamos la compra
+        if(response.Content != null)
+        {
+            bool ready = await GetPurchases();           //volvemos a obtener las compras
+            if (ready) await InvokeAsync(StateHasChanged);
+        }
+
+    }
+
+    public async Task<bool> GetPurchases()
+    {
+        order.Total = 0; 
+        string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
+        Purchases = (await HttpClient.GetFromJsonAsync<Response<Purchase>>(getPurchasesByOrder)).Content;
+        //obtenemos la lista de compras de una orden especifica
+        foreach (var purchase in Purchases) { order.Total += purchase.SubTotal; } //para sumar cuando dio el total
+        return true;
     }
 
     protected async override Task OnInitializedAsync()
     {
-        if(id!=0) //si es que seleccionamos un pedid
+        if (id != 0) //si es que seleccionamos un pedido
         {
-            string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
-            Purchases = (await HttpClient.GetFromJsonAsync<Response<Purchase>>(getPurchasesByOrder) ).Content;
-            //obtenemos la lista de compras de una orden especifica
+            bool ready = await GetPurchases();
+            if (ready) await InvokeAsync(StateHasChanged); order.Id = id;
+        }
+        else //si no creamos un nuevo pedido
+        {
+            var response = await HttpClient.PostAsJsonAsync<Order>("/api/Orders/add",
+                new Order { Total = 0, ClientId = 1 , DateMade = DateTime.Now }); //introducimos el nuevo pedido
+            order = (await response.Content.ReadFromJsonAsync<Response<Order>>()).Content.First(); //obtenemos el pedido creado
 
+        }
 
-            if (Purchases != null) await InvokeAsync(StateHasChanged);
-            foreach(var purchase in Purchases) { total += purchase.SubTotal; } //para sumar cuando dio el total
+        if (idArticle != 0)
+        {
+            string getArticlebyId = string.Format("/api/Articles?id={0}", idArticle);
+            var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyId)).Content.First(); //obtenemos el articulo mediante su codigo
+            codeArticle = article.Code.ToString(); descriptionArticle = article.Description;
         }
     }
+
+
 
 }

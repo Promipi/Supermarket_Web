@@ -119,6 +119,8 @@ using System.Net.Http.Json;
 #nullable disable
     [Microsoft.AspNetCore.Components.RouteAttribute("/orderForm")]
     [Microsoft.AspNetCore.Components.RouteAttribute("/orderForm/{id:int}")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/orderForm/{id:int}/{idArticle:int}")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/orderForm/{id:int}/{idArticle:int}/{idClient:int}")]
     public partial class OrderForm : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
@@ -127,55 +129,105 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 65 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\OrderForm.razor"
+#line 81 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\OrderForm.razor"
        
     List<Purchase> Purchases = new List<Purchase>(); //la lista de compras que tendra el pedido
     [Parameter] public int id { get; set; }
+    [Parameter] public int idArticle { get; set; }
+    [Parameter] public int idClient { get; set; }
 
-    public string codeArticle;
-    public string descriptionArticle;
-    public string units; //las unidades
-    public float total; //el ottal que esta costando la compra
+    public string codeArticle = "";
+    public string descriptionArticle = "";
+    public string units = ""; //las unidades
+    public Order order { get; set; } = new Order();
 
     public async void InsertPurchase() //para introducir una compra
     {
-        string getArticlebyCode = string.Format("/api/Articles?code={0}",codeArticle);
-        var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
-        if(article != null)
+        if (units == "")
+            await JS.InvokeVoidAsync("alert", "Debe Rellenar Las Unidades");
+        else
         {
-            float subTotal = int.Parse(units) * article.Price;
+            string getArticlebyCode = string.Format("/api/Articles?code={0}", codeArticle);
+            var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
+            if (article != null)
+            {
+                float subTotal = int.Parse(units) * article.Price;
 
-            var newPurchase = new Purchase
-            { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId=id, ArticleNavigation=article };//creamos la nueva compra
+                var newPurchase = new Purchase
+                { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId = order.Id, ArticleNavigation = article };//creamos la nueva compra
 
-            var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
+                var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
 
-            Purchases.Add(newPurchase);
-            if (response != null) await InvokeAsync(StateHasChanged); total += subTotal;
+                Purchases.Add(newPurchase);
+                if (response != null) order.Total += subTotal; await InvokeAsync(StateHasChanged);
 
-            units = codeArticle = ""; //reciniamos los campos
+                units = codeArticle = ""; //reciniamos los campos
 
+            }
         }
+
+
+    }
+
+    public async void SendOrder()
+    {
+        order.DateMade = DateTime.Now; order.ClientId = 1; //establecmeos sus propiedades
+        var response = await HttpClient.PutAsJsonAsync<Order>("/api/Orders", order); //actualizamos el pedido
+        Navigation.NavigateTo("/");
+    }
+    public async void DeletePurchase(int idPurchase) //eliminar una compra
+    {
+        string deletePurchaseById = $"/api/Purchases?id={idPurchase}";
+        var response = await HttpClient.DeleteAsync(deletePurchaseById); //eliminamos la compra
+        if(response.Content != null)
+        {
+            bool ready = await GetPurchases();           //volvemos a obtener las compras
+            if (ready) await InvokeAsync(StateHasChanged);
+        }
+
+    }
+
+    public async Task<bool> GetPurchases()
+    {
+        order.Total = 0; 
+        string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
+        Purchases = (await HttpClient.GetFromJsonAsync<Response<Purchase>>(getPurchasesByOrder)).Content;
+        //obtenemos la lista de compras de una orden especifica
+        foreach (var purchase in Purchases) { order.Total += purchase.SubTotal; } //para sumar cuando dio el total
+        return true;
     }
 
     protected async override Task OnInitializedAsync()
     {
-        if(id!=0) //si es que seleccionamos un pedid
+        if (id != 0) //si es que seleccionamos un pedido
         {
-            string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
-            Purchases = (await HttpClient.GetFromJsonAsync<Response<Purchase>>(getPurchasesByOrder) ).Content;
-            //obtenemos la lista de compras de una orden especifica
+            bool ready = await GetPurchases();
+            if (ready) await InvokeAsync(StateHasChanged); order.Id = id;
+        }
+        else //si no creamos un nuevo pedido
+        {
+            var response = await HttpClient.PostAsJsonAsync<Order>("/api/Orders/add",
+                new Order { Total = 0, ClientId = 1 , DateMade = DateTime.Now }); //introducimos el nuevo pedido
+            order = (await response.Content.ReadFromJsonAsync<Response<Order>>()).Content.First(); //obtenemos el pedido creado
 
+        }
 
-            if (Purchases != null) await InvokeAsync(StateHasChanged);
-            foreach(var purchase in Purchases) { total += purchase.SubTotal; } //para sumar cuando dio el total
+        if (idArticle != 0)
+        {
+            string getArticlebyId = string.Format("/api/Articles?id={0}", idArticle);
+            var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyId)).Content.First(); //obtenemos el articulo mediante su codigo
+            codeArticle = article.Code.ToString(); descriptionArticle = article.Description;
         }
     }
+
+
 
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private IJSRuntime JS { get; set; }
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private NavigationManager Navigation { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private HttpClient HttpClient { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private RestClient RestClient { get; set; }
     }

@@ -17,8 +17,9 @@ namespace Supermarket.SERVER.Controllers
         public IActionResult GetAllArticles(int? id,int? code)
         {
             Response<Article> response = new Response<Article>();
+
             if(id!=null)    response = ArticlesRepository.GetArticleById(id); //obtenemos un articulo  mediante su id
-            if(code!=null)  response = ArticlesRepository.GetArticleByCode(code); //obtenemos un articulo mediante su codigo
+            else if(code!=null)  response = ArticlesRepository.GetArticleByCode(code); //obtenemos un articulo mediante su codigo
             else            response = ArticlesRepository.GetAllArticles(); //obtenemos todos los articulos    
 
 

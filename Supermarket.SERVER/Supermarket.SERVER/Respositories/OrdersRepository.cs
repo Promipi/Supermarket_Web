@@ -49,12 +49,15 @@ namespace Supermarket.SERVER.Respositories
         public static Response<Order> InsertOrder(Order newOrder)
         {
             var response = new Response<Order>();
-
-            string query = "INSERT INTO [dbo].[Orders] VALUES(@ClientId,@DateMade,@Total,@PaymentMethod ) ";            
+            Order order = new Order { PaymentMethod = newOrder.PaymentMethod, Total = newOrder.Total, DateMade = DateTime.Now, ClientId = newOrder.ClientId };
+            //creamos la orden para introducirla a la bvbd
             try
             {
-                sqlConnection.Execute(query,newOrder); //ejecutamos nuestro query para introdicr el nuevo pedido                  
-                response.Sucess = true; response.Message = sucess;
+                using(Supermarket_DbContext db = new Supermarket_DbContext() )
+                {
+                    db.Orders.Add(order); db.SaveChanges(); //introducimos el nuevo pedido y guardamos cambios
+                }
+                response.Sucess = true; response.Message = sucess; response.Content.Add(order);
             }
             catch(Exception ex)
             {
@@ -66,18 +69,13 @@ namespace Supermarket.SERVER.Respositories
         public static Response<Order> UpdateOrder(Order order) //actualizar un pedido
         {
             var response = new Response<Order>();
-            try
-            {
+           
                 using(Supermarket_DbContext db = new Supermarket_DbContext() )
                 {
                     db.Orders.Update(order); db.SaveChanges();  //actualizamos la orden y guardamos cambios
                     response.Sucess = true; response.Message = sucess;
                 }
-            }
-            catch(Exception ex)
-            {
-                response.Sucess = false; response.Message = ex.Message;
-            }
+           
             return response;
         }
             

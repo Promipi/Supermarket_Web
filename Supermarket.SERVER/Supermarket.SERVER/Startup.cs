@@ -34,7 +34,7 @@ namespace Supermarket.SERVER
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Supermarket.SERVER", Version = "v1" });
             });
-            services.AddDbContext<Supermarket_DbContext>(options => options.UseSqlServer(Direc.SqlConnection));
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
