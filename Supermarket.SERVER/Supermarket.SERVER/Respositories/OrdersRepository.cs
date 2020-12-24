@@ -45,6 +45,22 @@ namespace Supermarket.SERVER.Respositories
             return response;
         }
 
+        public static Response<Order> GetOrdersById(int? id)
+        {
+            var response = new Response<Order>();
+            string query = string.Format("SELECT * FROM [dbo].[Orders] WHERE Id = {0}  ", id); //seleccionar pedidos
+            try
+            {
+                response.Content = sqlConnection.Query<Order>(query).ToList(); //obtenemos la lista de pedidos del cleinte especifico
+                response.Sucess = true; response.Message = sucess;
+            }
+            catch (Exception ex) //si ocurre un excepcion
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
+        }
+
 
         public static Response<Order> InsertOrder(Order newOrder)
         {
@@ -83,10 +99,12 @@ namespace Supermarket.SERVER.Respositories
         {
             var response = new Response<Order>();
 
-            string query = string.Format("DELETE FROM [dbo].[Orders] WHERE '{0}' ", idOrder);
+            string query = string.Format("DELETE FROM [dbo].[Orders] WHERE Id =  '{0}' ", idOrder);
+            string deletePurchasesByOrder = $"DELETE FROM [dbo].[Purchases] WHERE OrderId = {idOrder}";
             //query para eliminar una order
             try
-            {
+            { 
+                sqlConnection.Execute(deletePurchasesByOrder); //elimnamos todas las compras del pedido
                 sqlConnection.Execute(query);                   //ejecutamos nuestro query
                 response.Sucess = true; response.Message = sucess;
             }

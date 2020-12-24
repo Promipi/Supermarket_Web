@@ -125,7 +125,7 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 34 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Shared\NavMenu.razor"
+#line 39 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Shared\NavMenu.razor"
        
     private bool collapseNavMenu = true;
 

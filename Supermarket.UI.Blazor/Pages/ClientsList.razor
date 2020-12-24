@@ -1,0 +1,59 @@
+﻿
+@page "/clientsList"
+@page "/clientsList/{idOrder:int}"
+@inject RestClient RestClient
+
+<h1>Lista De Clientes</h1>
+
+@if (Clients.Count() != 0)
+{
+    <table class="table" border="1">
+        <tr>
+            <td style="background-color:dodgerblue"><b>Ruc</b></td>
+            <td style="background-color:dodgerblue"><b>Nombre</b></td>
+            <td style="background-color:dodgerblue"><b>Gmail</b></td>
+            <td style="background-color:dodgerblue"><b>Telefono</b></td>
+            <td style="background-color:dodgerblue"><b>Edad</b></td>
+        </tr>
+        @foreach (var client in Clients)
+        {
+            <tr>
+                <td>@client.Ruc</td>
+                <td>@client.Name</td>
+                <td>@client.Gmail</td>
+                <td>@client.PhoneNumber</td>
+                <td>@client.Age</td>
+                <td>
+                    @if (idOrder != 0)
+                    {
+                        <a href="/orderForm/@idOrder/@client.Id" class="btn" style="background-color: dodgerblue">Seleccionar</a>
+                    }
+                    else
+                    {
+                        <a class="btn btn-success">Editar</a>
+                        <a class="btn btn-danger">Eliminar</a>
+                    }
+
+                </td>
+
+            </tr>
+        }
+    </table>
+
+
+}
+
+
+
+@code
+{
+    [Parameter] public int idOrder { get; set; }
+    List<Client> Clients { get; set; } = new List<Client>();
+    protected async override Task OnInitializedAsync()
+    {
+        string getAllClients = "/api/Clients";
+        RestRequest request = new RestRequest(getAllClients, Method.GET); //creamos la peticion para obtener los articulos
+        var response = RestClient.Execute(request); //ejecutamos la peticion
+        Clients = JsonConvert.DeserializeObject<Response<Client>>(response.Content).Content; //obtenemos la lista de articulos de nuestra petcion
+    }
+}

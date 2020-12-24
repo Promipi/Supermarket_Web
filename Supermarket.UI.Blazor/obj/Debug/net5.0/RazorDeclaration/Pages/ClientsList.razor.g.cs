@@ -117,8 +117,9 @@ using System.Net.Http.Json;
 #line default
 #line hidden
 #nullable disable
-    [Microsoft.AspNetCore.Components.RouteAttribute("/orderList")]
-    public partial class OrderList : Microsoft.AspNetCore.Components.ComponentBase
+    [Microsoft.AspNetCore.Components.RouteAttribute("/clientsList")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/clientsList/{idOrder:int}")]
+    public partial class ClientsList : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
         protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder __builder)
@@ -126,40 +127,21 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 34 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\OrderList.razor"
-           
-        List<Order> Orders = new List<Order>();
-
-        public async void DeleteOrder(int idOrder)
-        {
-            string deleteOrder = $"api/Orders?idOrder={idOrder}";
-            var response = await httpClient.DeleteAsync(deleteOrder);
-            if (response.Content != null)
-            {
-                bool ready = await GetOrders(); if (ready) await InvokeAsync(StateHasChanged);
-            }
-        }
-
-        public async Task<bool> GetOrders()
-        {
-            string getAllOrders = "/api/Orders";
-            var response = await httpClient.GetFromJsonAsync<Response<Order>>(getAllOrders);
-            Orders = response.Content;
-            return true;
-        }
-
-        protected async override Task OnInitializedAsync()
-        {
-            bool ready = await GetOrders(); if (ready) await InvokeAsync(StateHasChanged);
-        }
-
-
-    
+#line 49 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\ClientsList.razor"
+ 
+    [Parameter] public int idOrder { get; set; }
+    List<Client> Clients { get; set; } = new List<Client>();
+    protected async override Task OnInitializedAsync()
+    {
+        string getAllClients = "/api/Clients";
+        RestRequest request = new RestRequest(getAllClients, Method.GET); //creamos la peticion para obtener los articulos
+        var response = RestClient.Execute(request); //ejecutamos la peticion
+        Clients = JsonConvert.DeserializeObject<Response<Client>>(response.Content).Content; //obtenemos la lista de articulos de nuestra petcion
+    }
 
 #line default
 #line hidden
 #nullable disable
-        [global::Microsoft.AspNetCore.Components.InjectAttribute] private HttpClient httpClient { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private RestClient RestClient { get; set; }
     }
 }

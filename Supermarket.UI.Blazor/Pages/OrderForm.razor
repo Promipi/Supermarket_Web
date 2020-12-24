@@ -10,9 +10,8 @@
 
 <h3>Pedido Form</h3>
 
-<a href="/articlesList/@order.Id" class="btn " style="background-color:lemonchiffon">Articulos</a>
 
-<div style="height:600px;overflow:scroll" >
+<div style="height:600px;overflow:scroll">
     <table class="table" border="1">
 
 
@@ -22,35 +21,32 @@
             <td style="background-color:dodgerblue"><b>Precio</b></td>
             <td style="background-color:dodgerblue"><b>Unidades</b></td>
             <td style="background-color:dodgerblue"><b>Subtotal</b></td>
-            <td style="background-color:dodgerblue"><b>Opciones</b></td>
+            <td style="background-color:dodgerblue;width:300px" ><b>Opciones</b></td>
         </tr>
 
         <tr>
 
             <td>
-                <EditForm Model="Purchases">
-                    <InputText @bind-Value="codeArticle" style="width:100px"> </InputText>
-                    <DataAnnotationsValidator></DataAnnotationsValidator>
-                </EditForm>
+                <input placeholder="Ingrese Codigo.." type="text" @bind="codeArticle" />
             </td>
             <td>
-                <EditForm Model="Purchases">
-                    <InputText @bind-Value="descriptionArticle"> </InputText>
-                    <DataAnnotationsValidator></DataAnnotationsValidator>
-                </EditForm>
+                <input  type="text" @bind="descriptionArticle"/>
             </td>
             <td>
             </td>
             <td>
-                <EditForm Model="Purchases">
-                    <InputText style="width:100px " @bind-Value="units"> </InputText>
-                    <DataAnnotationsValidator></DataAnnotationsValidator>
-                </EditForm>
+                <input placeholder="Ingrese Las Unidades.." type="text" @bind="units" />
             </td>
             <td>
-                <button class="btn btn-success" @onclick="InsertPurchase">Introducir</button>
+               
             </td>
-            <td></td>
+            <td>
+                @if (order.Id != 0)
+                {
+                    <button class="btn btn-success" style="background-color:dodgerblue;width:100px" @onclick="InsertPurchase">Introducir</button>
+                    <a href="/articlesList/@order.Id"  class="btn " style="background-color:gold; width:100px">Articulos</a>
+                }
+            </td>
         </tr>
         @if (Purchases != null)
         {
@@ -63,8 +59,8 @@
                     <td>@purchase.Units</td>
                     <td>@purchase.SubTotal</td>
                     <td>
-                        <a class="btn btn-success">Editar</a>
-                        <a class="btn btn-danger" @onclick="@(() => DeletePurchase(purchase.Id) )">Eliminar</a>
+                        <a class="btn btn-success" style="width:100px">Editar</a>
+                        <a class="btn btn-danger" style="width:100px" @onclick="@(() => DeletePurchase(purchase.Id) )">Eliminar</a>
                     </td>
 
                 </tr>
@@ -76,7 +72,8 @@
 </div>
 
 <h3 style="text-align:end">Total:@order.Total</h3>
-<button @onclick="SendOrder" class="btn btn-success">Facturar</button>
+<button @onclick="SendOrder" class="btn btn-success">Guardar</button>
+<button @onclick="CancelOrder" class="btn btn-danger">Cancelar</button>
 
 @code {
     List<Purchase> Purchases = new List<Purchase>(); //la lista de compras que tendra el pedido
@@ -91,43 +88,46 @@
 
     public async void InsertPurchase() //para introducir una compra
     {
-        if (units == "")
-            await JS.InvokeVoidAsync("alert", "Debe Rellenar Las Unidades");
+        if(codeArticle == "") await JS.InvokeVoidAsync("alert", "Debe Ingresar Un Codigo ");
+        else if (units == "") await JS.InvokeVoidAsync("alert", "Debe Ingresar Las Unidades"); //si no digito las unidades
         else
         {
             string getArticlebyCode = string.Format("/api/Articles?code={0}", codeArticle);
-            var article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
-            if (article != null)
+            Article article = new Article();
+            try
             {
-                float subTotal = int.Parse(units) * article.Price;
+                article = (await HttpClient.GetFromJsonAsync<Response<Article>>(getArticlebyCode)).Content.First(); //obtenemos el articulo mediante su codigo
 
-                var newPurchase = new Purchase
-                { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId = order.Id, ArticleNavigation = article };//creamos la nueva compra
+                if (article != null)
+                {
+                    float subTotal = int.Parse(units) * article.Price;
 
-                var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
+                    var newPurchase = new Purchase
+                    { ArticleId = article.Id, SubTotal = subTotal, Units = int.Parse(units), OrderId = order.Id, ArticleNavigation = article };//creamos la nueva compra
 
-                Purchases.Add(newPurchase);
-                if (response != null) order.Total += subTotal; await InvokeAsync(StateHasChanged);
+                    var response = await HttpClient.PostAsJsonAsync<Purchase>("/api/Purchases", newPurchase); //mandamos lapeticion para introduicr la compra
 
-                units = codeArticle = ""; //reciniamos los campos
+                    Purchases.Add(newPurchase);
+                    if (response != null)
+                    {
+                        units = codeArticle = descriptionArticle = ""; //reciniamos los campos
+                        order.Total += subTotal; await InvokeAsync(StateHasChanged); //le sumamos al total el subtatoal de la cora introducida
+                    }
 
+                }
             }
+            catch { await JS.InvokeVoidAsync("alert", "No existe Ese Codigo De articulo "); }
+
         }
 
 
     }
 
-    public async void SendOrder()
-    {
-        order.DateMade = DateTime.Now; order.ClientId = 1; //establecmeos sus propiedades
-        var response = await HttpClient.PutAsJsonAsync<Order>("/api/Orders", order); //actualizamos el pedido
-        Navigation.NavigateTo("/");
-    }
     public async void DeletePurchase(int idPurchase) //eliminar una compra
     {
         string deletePurchaseById = $"/api/Purchases?id={idPurchase}";
         var response = await HttpClient.DeleteAsync(deletePurchaseById); //eliminamos la compra
-        if(response.Content != null)
+        if (response.Content != null)
         {
             bool ready = await GetPurchases();           //volvemos a obtener las compras
             if (ready) await InvokeAsync(StateHasChanged);
@@ -135,9 +135,24 @@
 
     }
 
+
+    public async void SendOrder()
+    {
+        order.ClientId = 1; //establecmeos sus propiedades
+        var response = await HttpClient.PutAsJsonAsync<Order>("/api/Orders", order); //actualizamos el pedido
+        Navigation.NavigateTo("/");
+    }
+    public async void CancelOrder()
+    {
+        string deleteOrder = $"api/Orders?idOrder={order.Id}";
+        var response = await HttpClient.DeleteAsync(deleteOrder);
+        Navigation.NavigateTo("/");
+    }
+
+
     public async Task<bool> GetPurchases()
     {
-        order.Total = 0; 
+        order.Total = 0;
         string getPurchasesByOrder = string.Format("/api/Purchases?idOrder={0}", id);
         Purchases = (await HttpClient.GetFromJsonAsync<Response<Purchase>>(getPurchasesByOrder)).Content;
         //obtenemos la lista de compras de una orden especifica
@@ -149,15 +164,16 @@
     {
         if (id != 0) //si es que seleccionamos un pedido
         {
+            order = (await HttpClient.GetFromJsonAsync<Response<Order>>($"api/Orders?id={id}")).Content.First(); //obtenemos el pedido mediante su id
             bool ready = await GetPurchases();
-            if (ready) await InvokeAsync(StateHasChanged); order.Id = id;
+            if (ready) await InvokeAsync(StateHasChanged);
         }
         else //si no creamos un nuevo pedido
         {
             var response = await HttpClient.PostAsJsonAsync<Order>("/api/Orders/add",
-                new Order { Total = 0, ClientId = 1 , DateMade = DateTime.Now }); //introducimos el nuevo pedido
+                new Order { Total = 0, ClientId = 1, DateMade = DateTime.Now }); //introducimos el nuevo pedido
             order = (await response.Content.ReadFromJsonAsync<Response<Order>>()).Content.First(); //obtenemos el pedido creado
-
+            if (order.Id != 0) await InvokeAsync(StateHasChanged); //para auq erecargue el html
         }
 
         if (idArticle != 0)

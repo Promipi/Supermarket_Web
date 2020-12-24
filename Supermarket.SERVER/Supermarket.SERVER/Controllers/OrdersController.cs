@@ -14,17 +14,22 @@ namespace Supermarket.SERVER.Controllers
     public class OrdersController : Controller
     {
         [HttpGet]
-        public IActionResult GetAllOrders(int? idClient)
+        public IActionResult GetAllOrders(int? idClient,int? id)
         {
             var response = new Response<Order>();
-            if(idClient == null) //si no pone para filtrar por cliente
+            if(idClient == null && id == null) //si no pone para filtrar por cliente
             {
                 response = OrdersRepository.GetAllOrders();
             }
-            else
+            else if(idClient != null)
             {
                 response = OrdersRepository.GetOrdersByClient(idClient);
             }
+            else if(id != null)
+            {
+                response = OrdersRepository.GetOrdersById(id);
+            }
+
             if (response.Sucess) return Ok(response);
             else return Problem(response.Message);
         }
