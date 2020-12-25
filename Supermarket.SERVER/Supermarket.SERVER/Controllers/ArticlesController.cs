@@ -42,9 +42,9 @@ namespace Supermarket.SERVER.Controllers
             else                 return Problem(response.Message);
         }
         [HttpDelete]
-        public IActionResult DeleteArticle(int id)
+        public IActionResult DeleteArticle(int idArticle)
         {
-            var response = ArticlesRepository.DeleteArticle(id); //eliminamos el articulo mediante su id
+            var response = ArticlesRepository.DeleteArticle(idArticle); //eliminamos el articulo mediante su id
             if (response.Sucess) return Ok(response);
             else                 return Problem(response.Message);
         }

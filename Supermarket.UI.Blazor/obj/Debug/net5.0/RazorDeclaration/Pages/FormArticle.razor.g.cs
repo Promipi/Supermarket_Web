@@ -117,9 +117,9 @@ using System.Net.Http.Json;
 #line default
 #line hidden
 #nullable disable
-    [Microsoft.AspNetCore.Components.RouteAttribute("/clientsList")]
-    [Microsoft.AspNetCore.Components.RouteAttribute("/clientsList/{idOrder:int}")]
-    public partial class ClientsList : Microsoft.AspNetCore.Components.ComponentBase
+    [Microsoft.AspNetCore.Components.RouteAttribute("/articleForm")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/articleForm/{id:int}")]
+    public partial class FormArticle : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
         protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder __builder)
@@ -127,33 +127,61 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 52 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\ClientsList.razor"
- 
-    [Parameter] public int idOrder { get; set; }
-    List<Client> Clients { get; set; } = new List<Client>();
+#line 21 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\FormArticle.razor"
+       
+    [Parameter] public int id { get; set; }
+
+    Article article = new Article();
+    string codeArticle;
+    string familyArticle;
+    string descriptionArticle;
+    string priceArticle;
+
     protected async override Task OnInitializedAsync()
     {
-        var result = await GetClients();
-        if (result) await InvokeAsync(StateHasChanged);
+        if (id != 0) //si editaremos
+        {
+            article = (await httpClient.GetFromJsonAsync<Response<Article>>($"/api/Articles?id={id}")).Content.First();
+            //obtenemos el articulo
+            if (article.Code != 0)
+            {
+                codeArticle = article.Code.ToString(); familyArticle = article.Family;
+                descriptionArticle = article.Description; priceArticle = article.Price.ToString();
+                await InvokeAsync(StateHasChanged); //establecemos las propiedades y recargamos los compenetes
+            }
+
+
+        }
     }
 
-    public async void DeleteClient(int id)
+    public async void Cancel()
     {
-        await httpClient.DeleteAsync($"api/Clients?id={id}"); //eliminamos el cliente mediante su id
-        bool ready = await GetClients();
-        if  (ready)  await InvokeAsync(StateHasChanged);
+        Navigation.NavigateTo("/articlesList");
     }
 
-    public async Task<bool> GetClients()
+    private async void SaveArticle()
     {
-        string getAllClients = "/api/Clients";
-        Clients = (await httpClient.GetFromJsonAsync<Response<Client>>(getAllClients)).Content;
-        return true;
+        if (id == 0) //significa que crearemos un articulo
+        {
+            article = new Article
+            { Code = int.Parse(codeArticle), Description = descriptionArticle, Family = familyArticle, Price = int.Parse(priceArticle) };
+
+            var response = await httpClient.PostAsJsonAsync<Article>("api/Articles/add", article);
+            //envimaos el nuevo articulo creado
+        }
+        else
+        {
+            article.Code = int.Parse(codeArticle); article.Description = descriptionArticle; article.Price = int.Parse(priceArticle); article.Family = familyArticle;
+            await httpClient.PutAsJsonAsync<Article>("api/Articles", article);
+        }
+        Navigation.NavigateTo("/articlesList");
+
     }
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private NavigationManager Navigation { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private HttpClient httpClient { get; set; }
     }
 }

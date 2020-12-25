@@ -1,48 +1,51 @@
 ﻿
 @page "/clientsList"
 @page "/clientsList/{idOrder:int}"
-@inject RestClient RestClient
+@inject HttpClient httpClient
 
 <h1>Lista De Clientes</h1>
 
-@if (Clients.Count() != 0)
-{
-    <table class="table" border="1">
-        <tr>
-            <td style="background-color:dodgerblue"><b>Ruc</b></td>
-            <td style="background-color:dodgerblue"><b>Nombre</b></td>
-            <td style="background-color:dodgerblue"><b>Gmail</b></td>
-            <td style="background-color:dodgerblue"><b>Telefono</b></td>
-            <td style="background-color:dodgerblue"><b>Edad</b></td>
-        </tr>
-        @foreach (var client in Clients)
-        {
+<div style="height:620px;overflow:scroll">
+    @if (Clients.Count() != 0)
+    {
+        <table class="table" border="1">
             <tr>
-                <td>@client.Ruc</td>
-                <td>@client.Name</td>
-                <td>@client.Gmail</td>
-                <td>@client.PhoneNumber</td>
-                <td>@client.Age</td>
-                <td>
-                    @if (idOrder != 0)
-                    {
-                        <a href="/orderForm/@idOrder/@client.Id" class="btn" style="background-color: dodgerblue">Seleccionar</a>
-                    }
-                    else
-                    {
-                        <a class="btn btn-success">Editar</a>
-                        <a class="btn btn-danger">Eliminar</a>
-                    }
-
-                </td>
-
+                <td style="background-color:dodgerblue"><b>Ruc</b></td>
+                <td style="background-color:dodgerblue"><b>Nombre</b></td>
+                <td style="background-color:dodgerblue"><b>Gmail</b></td>
+                <td style="background-color:dodgerblue"><b>Telefono</b></td>
+                <td style="background-color:dodgerblue"><b>Edad</b></td>
             </tr>
-        }
-    </table>
+            @foreach (var client in Clients)
+            {
+                <tr>
+                    <td>@client.Ruc</td>
+                    <td>@client.Name</td>
+                    <td>@client.Gmail</td>
+                    <td>@client.PhoneNumber</td>
+                    <td>@client.Age</td>
+                    <td>
+                        @if (idOrder != 0)
+                        {
+                            <a href="/orderForm/@idOrder/@client.Id" class="btn" style="background-color: dodgerblue">Seleccionar</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-success" href="clientForm/@client.Id">Editar</a>
+                            <a class="btn btn-danger" @onclick="(() => DeleteClient(client.Id) )">Eliminar</a>
+                        }
+
+                    </td>
+
+                </tr>
+            }
+        </table>
 
 
-}
+    }
+</div>
 
+<a class="btn" style="background-color:darkgoldenrod" href="clientForm">Nuevo Cliente</a>
 
 
 @code
@@ -51,9 +54,22 @@
     List<Client> Clients { get; set; } = new List<Client>();
     protected async override Task OnInitializedAsync()
     {
+        var result = await GetClients();
+        if (result) await InvokeAsync(StateHasChanged);
+    }
+
+    public async void DeleteClient(int id)
+    {
+        await httpClient.DeleteAsync($"api/Clients?id={id}"); //eliminamos el cliente mediante su id
+        bool ready = await GetClients();
+        if  (ready)  await InvokeAsync(StateHasChanged);
+    }
+
+    public async Task<bool> GetClients()
+    {
         string getAllClients = "/api/Clients";
-        RestRequest request = new RestRequest(getAllClients, Method.GET); //creamos la peticion para obtener los articulos
-        var response = RestClient.Execute(request); //ejecutamos la peticion
-        Clients = JsonConvert.DeserializeObject<Response<Client>>(response.Content).Content; //obtenemos la lista de articulos de nuestra petcion
+        Clients = (await httpClient.GetFromJsonAsync<Response<Client>>(getAllClients)).Content;
+        return true;
     }
 }
+

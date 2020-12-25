@@ -18,7 +18,7 @@ namespace Supermarket.SERVER.Respositories
         {
             var response = new Response<Article>();
 
-            string query = "INSERT INTO [dbo].[Articles] VALUES (@Family,@Description,@Price)";
+            string query = "INSERT INTO [dbo].[Articles] VALUES (@Family,@Description,@Price,@Code)";
             try
             {
                 var result = sqlConnection.Execute(query,newArticle); //insertamos el nuevo articulo a la base de datos    

@@ -11,54 +11,57 @@
 <h3>Pedido Form</h3>
 
 
-<div style="height:600px;overflow:scroll">
+
+<table class="table" border="1">
+
+
+    <tr >
+        <td style="background-color:dodgerblue;width:275px"><b>Codigo</b></td>
+        <td style="background-color:dodgerblue;width:275px"><b>Nombre</b></td>
+        <td style="background-color:dodgerblue;width:275px"><b>Precio</b></td>
+        <td style="background-color:dodgerblue;width:275px"><b>Unidades</b></td>
+        <td style="background-color:dodgerblue;width:275px"><b>Subtotal</b></td>
+        <td style="background-color:dodgerblue;width:275px"><b>Opciones</b></td>
+    </tr>
+
+    <tr>
+
+        <td>
+            <input placeholder="Ingrese Codigo.." type="text" @bind="codeArticle" />
+        </td>
+        <td>
+            <input type="text" @bind="descriptionArticle" />
+        </td>
+        <td>
+        </td>
+        <td>
+            <input placeholder="Ingrese Las Unidades.." type="text" @bind="units" />
+        </td>
+        <td>
+        </td>
+        <td>
+            @if (order.Id != 0)
+            {
+                <button class="btn btn-success" style="background-color:dodgerblue;width:100px" @onclick="InsertPurchase">Introducir</button>
+                <a href="/articlesList/@order.Id" class="btn " style="background-color:gold; width:100px">Articulos</a>
+            }
+        </td>
+    </tr>
+</table>
+    
+<div style="height:620px;overflow:scroll">
     <table class="table" border="1">
-
-
-        <tr style="width:100px">
-            <td style="background-color:dodgerblue"><b>Codigo</b></td>
-            <td style="background-color:dodgerblue"><b>Nombre</b></td>
-            <td style="background-color:dodgerblue"><b>Precio</b></td>
-            <td style="background-color:dodgerblue"><b>Unidades</b></td>
-            <td style="background-color:dodgerblue"><b>Subtotal</b></td>
-            <td style="background-color:dodgerblue;width:300px" ><b>Opciones</b></td>
-        </tr>
-
-        <tr>
-
-            <td>
-                <input placeholder="Ingrese Codigo.." type="text" @bind="codeArticle" />
-            </td>
-            <td>
-                <input  type="text" @bind="descriptionArticle"/>
-            </td>
-            <td>
-            </td>
-            <td>
-                <input placeholder="Ingrese Las Unidades.." type="text" @bind="units" />
-            </td>
-            <td>
-               
-            </td>
-            <td>
-                @if (order.Id != 0)
-                {
-                    <button class="btn btn-success" style="background-color:dodgerblue;width:100px" @onclick="InsertPurchase">Introducir</button>
-                    <a href="/articlesList/@order.Id"  class="btn " style="background-color:gold; width:100px">Articulos</a>
-                }
-            </td>
-        </tr>
         @if (Purchases != null)
         {
             @foreach (var purchase in Purchases)
             {
                 <tr>
-                    <td>@purchase.ArticleNavigation.Code</td>
-                    <td>@purchase.ArticleNavigation.Description</td>
-                    <td>@purchase.ArticleNavigation.Price</td>
-                    <td>@purchase.Units</td>
-                    <td>@purchase.SubTotal</td>
-                    <td>
+                    <td style="width:300px">@purchase.ArticleNavigation.Code</td>
+                    <td style="width:300px">@purchase.ArticleNavigation.Description</td>
+                    <td style="width:300px">@purchase.ArticleNavigation.Price</td>
+                    <td style="width:300px">@purchase.Units</td>
+                    <td style="width:300px">@purchase.SubTotal</td>
+                    <td style="width:300px">
                         <a class="btn btn-success" style="width:100px">Editar</a>
                         <a class="btn btn-danger" style="width:100px" @onclick="@(() => DeletePurchase(purchase.Id) )">Eliminar</a>
                     </td>
@@ -67,9 +70,11 @@
             }
         }
 
-    </table>
-
+    </table>    
 </div>
+   
+
+
 
 <h3 style="text-align:end">Total:@order.Total</h3>
 <button @onclick="SendOrder" class="btn btn-success">Guardar</button>
@@ -138,7 +143,7 @@
 
     public async void SendOrder()
     {
-        order.ClientId = 1; //establecmeos sus propiedades
+        order.ClientId = 2; //establecmeos sus propiedades
         var response = await HttpClient.PutAsJsonAsync<Order>("/api/Orders", order); //actualizamos el pedido
         Navigation.NavigateTo("/");
     }

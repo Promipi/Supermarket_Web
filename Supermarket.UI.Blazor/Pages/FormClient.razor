@@ -1,0 +1,54 @@
+﻿@page "/clientForm"
+@page "/clientForm/{id:int}"
+@inject HttpClient httpClient
+@inject NavigationManager Navigation
+<h3>Form Client</h3>
+
+<EditForm Model="client" OnValidSubmit="SaveClient">
+    <p>Ruc</p>
+    <input @bind="client.Ruc" />
+    <p>Nombre</p>
+    <input @bind="client.Name" />
+    <p>Numero Telefono</p>
+    <input @bind="client.PhoneNumber" />
+    <p>Gmail</p>
+    <input @bind="client.Gmail" />
+    <p>Edad (opcional) </p>
+    <input @bind="client.Age" />
+</EditForm>
+
+<button class="btn btn-success" @onclick="SaveClient">Guardar</button>
+<a class="btn btn-danger" href="clientsList">Cancelar</a>
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Client client = new Client();
+
+    protected async override Task OnInitializedAsync()
+    {
+        if(id != 0) //cargaremos los datos
+        {
+
+            client = (await httpClient.GetFromJsonAsync<Response<Client>>($"/api/Clients?id={id}") ).Content.First();
+            if (client.Id != 0) await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            client.Name = ""; client.PhoneNumber = null; client.Ruc = null; client.Gmail = "";
+        }
+    }
+
+    public async void SaveClient()
+    {
+        if(id == 0) //siginiica que crearemos un cliente
+        {
+            await httpClient.PostAsJsonAsync<Client>("/api/Clients/add", client); //enviamos el cliente
+        }
+        else
+        {
+            await httpClient.PutAsJsonAsync<Client>("/api/Clients", client); //actualizamos al cliente
+        }
+        Navigation.NavigateTo("/clientsList");
+    }
+}

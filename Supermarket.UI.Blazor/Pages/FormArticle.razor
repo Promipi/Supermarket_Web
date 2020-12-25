@@ -1,0 +1,70 @@
+﻿@page "/articleForm"
+@page "/articleForm/{id:int}"
+@inject HttpClient httpClient
+@inject NavigationManager Navigation
+<h3>FormArticle</h3>
+
+<EditForm Model="article" OnValidSubmit="SaveArticle">
+    <p>Codigo</p>
+    <InputText @bind-Value="codeArticle"></InputText>
+    <p>Familia</p>
+    <InputText @bind-Value="familyArticle"></InputText>
+    <p>Descripcion</p>
+    <InputText @bind-Value="descriptionArticle"></InputText>
+    <p>Precio</p>
+    <InputText @bind-Value="priceArticle"></InputText>
+
+    <button class="btn btn-success" >Guardar</button>
+</EditForm>
+<button class="btn btn-danger" @onclick="Cancel">Cancelar</button>
+
+@code {
+    [Parameter] public int id { get; set; }
+
+    Article article = new Article();
+    string codeArticle;
+    string familyArticle;
+    string descriptionArticle;
+    string priceArticle;
+
+    protected async override Task OnInitializedAsync()
+    {
+        if (id != 0) //si editaremos
+        {
+            article = (await httpClient.GetFromJsonAsync<Response<Article>>($"/api/Articles?id={id}")).Content.First();
+            //obtenemos el articulo
+            if (article.Code != 0)
+            {
+                codeArticle = article.Code.ToString(); familyArticle = article.Family;
+                descriptionArticle = article.Description; priceArticle = article.Price.ToString();
+                await InvokeAsync(StateHasChanged); //establecemos las propiedades y recargamos los compenetes
+            }
+
+
+        }
+    }
+
+    public async void Cancel()
+    {
+        Navigation.NavigateTo("/articlesList");
+    }
+
+    private async void SaveArticle()
+    {
+        if (id == 0) //significa que crearemos un articulo
+        {
+            article = new Article
+            { Code = int.Parse(codeArticle), Description = descriptionArticle, Family = familyArticle, Price = int.Parse(priceArticle) };
+
+            var response = await httpClient.PostAsJsonAsync<Article>("api/Articles/add", article);
+            //envimaos el nuevo articulo creado
+        }
+        else
+        {
+            article.Code = int.Parse(codeArticle); article.Description = descriptionArticle; article.Price = int.Parse(priceArticle); article.Family = familyArticle;
+            await httpClient.PutAsJsonAsync<Article>("api/Articles", article);
+        }
+        Navigation.NavigateTo("/articlesList");
+
+    }
+}

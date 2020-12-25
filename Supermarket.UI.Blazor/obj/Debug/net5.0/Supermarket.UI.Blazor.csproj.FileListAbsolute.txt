@@ -62,3 +62,7 @@ G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI
 G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\obj\Debug\net5.0\Razor\Pages\OrderList.razor.g.cs
 G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\obj\Debug\net5.0\RazorDeclaration\Pages\ClientsList.razor.g.cs
 G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\obj\Debug\net5.0\Razor\Pages\ClientsList.razor.g.cs
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\obj\Debug\net5.0\RazorDeclaration\Pages\FormArticle.razor.g.cs
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\obj\Debug\net5.0\Razor\Pages\FormArticle.razor.g.cs
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\obj\Debug\net5.0\RazorDeclaration\Pages\FormClient.razor.g.cs
+G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\obj\Debug\net5.0\Razor\Pages\FormClient.razor.g.cs

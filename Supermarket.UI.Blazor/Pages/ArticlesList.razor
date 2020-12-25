@@ -2,9 +2,12 @@
 @page "/articlesList"
 @page "/articlesList/{idOrder:int}"
 @inject RestClient RestClient
+@inject HttpClient httpClient
 
 <h1>Lista De Articulos</h1>
+<a href="/articleForm" class="btn" style="background-color:cornflowerblue">Crear Articulo</a>
 
+<div style="height:620px;overflow:scroll">
     @if (Articles.Count() != 0)
     {
         <table class="table" border="1">
@@ -26,30 +29,43 @@
                         }
                         else
                         {
-                            <a class="btn btn-success">Editar</a>
-                            <a class="btn btn-danger">Eliminar</a>
+                            <a class="btn btn-success" href="/articleForm/@article.Id">Editar</a>
+                            <a class="btn btn-danger" @onclick="@(() => DeleteArticle(article.Id) )">Eliminar</a>
                         }
 
                     </td>
-   
+
                 </tr>
             }
         </table>
 
 
     }
+</div>
 
 
-
-@code
+    @code
 {
-    [Parameter] public int idOrder { get; set; }
-    List<Article> Articles { get; set; } = new List<Article>();
-    protected async override Task OnInitializedAsync()
-    {
-        string getAllArticles = "/api/Articles";
-        RestRequest request = new RestRequest(getAllArticles, Method.GET); //creamos la peticion para obtener los articulos
-        var response = RestClient.Execute(request); //ejecutamos la peticion
-        Articles = JsonConvert.DeserializeObject<Response<Article>>(response.Content).Content; //obtenemos la lista de articulos de nuestra petcion
+        [Parameter] public int idOrder { get; set; }
+        List<Article> Articles { get; set; } = new List<Article>();
+
+        public async void DeleteArticle(int id)
+        {
+            await httpClient.DeleteAsync($"api/Articles?idArticle={id}");
+            var ready = await GetArticles();
+            if (ready) await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task<bool> GetArticles()
+        {
+            var response = await httpClient.GetFromJsonAsync<Response<Article>>("/api/Articles");
+            Articles = response.Content;
+            return true;
+        }
+
+        protected async override Task OnInitializedAsync()
+        {
+            bool ready = await GetArticles();
+            if (ready) await InvokeAsync(StateHasChanged);
+        }
     }
-}

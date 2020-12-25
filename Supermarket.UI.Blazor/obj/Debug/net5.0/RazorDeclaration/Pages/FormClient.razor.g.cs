@@ -117,9 +117,9 @@ using System.Net.Http.Json;
 #line default
 #line hidden
 #nullable disable
-    [Microsoft.AspNetCore.Components.RouteAttribute("/clientsList")]
-    [Microsoft.AspNetCore.Components.RouteAttribute("/clientsList/{idOrder:int}")]
-    public partial class ClientsList : Microsoft.AspNetCore.Components.ComponentBase
+    [Microsoft.AspNetCore.Components.RouteAttribute("/clientForm")]
+    [Microsoft.AspNetCore.Components.RouteAttribute("/clientForm/{id:int}")]
+    public partial class FormClient : Microsoft.AspNetCore.Components.ComponentBase
     {
         #pragma warning disable 1998
         protected override void BuildRenderTree(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder __builder)
@@ -127,33 +127,43 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 52 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\ClientsList.razor"
- 
-    [Parameter] public int idOrder { get; set; }
-    List<Client> Clients { get; set; } = new List<Client>();
+#line 23 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\FormClient.razor"
+       
+    [Parameter] public int id { get; set; }
+
+    Client client = new Client();
+
     protected async override Task OnInitializedAsync()
     {
-        var result = await GetClients();
-        if (result) await InvokeAsync(StateHasChanged);
+        if(id != 0) //cargaremos los datos
+        {
+
+            client = (await httpClient.GetFromJsonAsync<Response<Client>>($"/api/Clients?id={id}") ).Content.First();
+            if (client.Id != 0) await InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            client.Name = ""; client.PhoneNumber = null; client.Ruc = null; client.Gmail = "";
+        }
     }
 
-    public async void DeleteClient(int id)
+    public async void SaveClient()
     {
-        await httpClient.DeleteAsync($"api/Clients?id={id}"); //eliminamos el cliente mediante su id
-        bool ready = await GetClients();
-        if  (ready)  await InvokeAsync(StateHasChanged);
-    }
-
-    public async Task<bool> GetClients()
-    {
-        string getAllClients = "/api/Clients";
-        Clients = (await httpClient.GetFromJsonAsync<Response<Client>>(getAllClients)).Content;
-        return true;
+        if(id == 0) //siginiica que crearemos un cliente
+        {
+            await httpClient.PostAsJsonAsync<Client>("/api/Clients/add", client); //enviamos el cliente
+        }
+        else
+        {
+            await httpClient.PutAsJsonAsync<Client>("/api/Clients", client); //actualizamos al cliente
+        }
+        Navigation.NavigateTo("/clientsList");
     }
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private NavigationManager Navigation { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private HttpClient httpClient { get; set; }
     }
 }

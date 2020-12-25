@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Supermarket.SERVER.Data;
 using Supermarket.SERVER.Models;
 using Supermarket.SERVER.Respositories;
 using System;
@@ -13,10 +14,13 @@ namespace Supermarket.SERVER.Controllers
     public class ClientsController : Controller
     {
         [HttpGet]
-        public IActionResult GetAllClients()            //obtener todos los clientes
+        public IActionResult GetAllClients(int? id)            //obtener todos los clientes
         {
-            var response = ClientsRepository.GetAllClients(); //obtenems la respuesta de nuestra consulta
-            if(response.Sucess) return Ok(response);          //si no hubo errores
+            Response<Client> response = new Response<Client>();
+            if (id != null) response = ClientsRepository.GetClientById(id);
+            else            response = ClientsRepository.GetAllClients(); //obtenems la respuesta de nuestra consulta
+
+            if (response.Sucess) return Ok(response);          //si no hubo errores
             else                return Problem(response.Message); 
         }
 

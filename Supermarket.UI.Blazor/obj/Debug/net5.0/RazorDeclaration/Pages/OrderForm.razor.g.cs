@@ -129,7 +129,7 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 78 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\OrderForm.razor"
+#line 83 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\OrderForm.razor"
        
     List<Purchase> Purchases = new List<Purchase>(); //la lista de compras que tendra el pedido
     [Parameter] public int id { get; set; }
@@ -171,7 +171,7 @@ using System.Net.Http.Json;
 
                 }
             }
-            catch { await JS.InvokeVoidAsync("alert", "No existe Ese Codigo De artiuclo "); }
+            catch { await JS.InvokeVoidAsync("alert", "No existe Ese Codigo De articulo "); }
 
         }
 
@@ -193,7 +193,7 @@ using System.Net.Http.Json;
 
     public async void SendOrder()
     {
-        order.ClientId = 1; //establecmeos sus propiedades
+        order.ClientId = 2; //establecmeos sus propiedades
         var response = await HttpClient.PutAsJsonAsync<Order>("/api/Orders", order); //actualizamos el pedido
         Navigation.NavigateTo("/");
     }

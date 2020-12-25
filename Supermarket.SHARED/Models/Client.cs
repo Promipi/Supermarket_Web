@@ -9,11 +9,11 @@ namespace Supermarket.SHARED.Models
     {
         public int Id { get; set; }
 
-        public int Ruc { get; set; }
+        public int? Ruc { get; set; }
         public string Name { get; set; }
 
         public string Gmail { get; set; }
-        public int PhoneNumber { get; set; }
+        public int? PhoneNumber { get; set; }
 
         public int Age { get; set; }
 

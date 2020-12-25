@@ -127,21 +127,36 @@ using System.Net.Http.Json;
         }
         #pragma warning restore 1998
 #nullable restore
-#line 45 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\ArticlesList.razor"
+#line 48 "G:\Programacion_General\Proyectos de programacion\Supermarket_Web\Supermarket.UI.Blazor\Pages\ArticlesList.razor"
  
-    [Parameter] public int idOrder { get; set; }
-    List<Article> Articles { get; set; } = new List<Article>();
-    protected async override Task OnInitializedAsync()
-    {
-        string getAllArticles = "/api/Articles";
-        RestRequest request = new RestRequest(getAllArticles, Method.GET); //creamos la peticion para obtener los articulos
-        var response = RestClient.Execute(request); //ejecutamos la peticion
-        Articles = JsonConvert.DeserializeObject<Response<Article>>(response.Content).Content; //obtenemos la lista de articulos de nuestra petcion
-    }
+        [Parameter] public int idOrder { get; set; }
+        List<Article> Articles { get; set; } = new List<Article>();
+
+        public async void DeleteArticle(int id)
+        {
+            await httpClient.DeleteAsync($"api/Articles?idArticle={id}");
+            var ready = await GetArticles();
+            if (ready) await InvokeAsync(StateHasChanged);
+        }
+
+        public async Task<bool> GetArticles()
+        {
+            var response = await httpClient.GetFromJsonAsync<Response<Article>>("/api/Articles");
+            Articles = response.Content;
+            return true;
+        }
+
+        protected async override Task OnInitializedAsync()
+        {
+            bool ready = await GetArticles();
+            if (ready) await InvokeAsync(StateHasChanged);
+        }
+    
 
 #line default
 #line hidden
 #nullable disable
+        [global::Microsoft.AspNetCore.Components.InjectAttribute] private HttpClient httpClient { get; set; }
         [global::Microsoft.AspNetCore.Components.InjectAttribute] private RestClient RestClient { get; set; }
     }
 }

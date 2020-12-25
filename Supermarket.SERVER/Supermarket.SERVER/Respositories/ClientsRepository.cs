@@ -30,6 +30,21 @@ namespace Supermarket.SERVER.Respositories
             return response;
             
         }
+        public static Response<Client> GetClientById(int? id)
+        {
+            var response = new Response<Client>();
+            string query = $"SELECT * FROM [dbo].[Clients] WHERE Id = {id} ";
+            try
+            {
+                response.Content = sqlConnection.Query<Client>(query).ToList(); //retornamos la lista de clientes
+                response.Sucess = true; response.Message = sucess;
+            }
+            catch (Exception ex)
+            {
+                response.Sucess = false; response.Message = ex.Message;
+            }
+            return response;
+        }
         public static Response<Client> InsertClient(Client newClient)
         {
             var response = new Response<Client>();
@@ -49,11 +64,14 @@ namespace Supermarket.SERVER.Respositories
 
         public static Response<Client> DeleteClient(int id)
         {
+            sqlConnection.Open();
             var response = new Response<Client>();
-            string query = string.Format("DELETE FROM [dbo].[Clients] WHERE Id = {0} ", id); //query para eliminar un cliente
+            string updateOrder = $"UPDATE Orders SET ClientId = 2 Where ClientId = {id}";
+            string query = $"delete from Clients where Id = {id} "; //query para eliminar un cliente
             try
             {
-                sqlConnection.ExecuteAsync(query);
+                var a = sqlConnection.ExecuteAsync(updateOrder); //las ordenes que contenian a ese cleinte las actualizamos a cleinte anonimo
+                a = sqlConnection.ExecuteAsync(query);
                 response.Sucess = true; response.Message = sucess;
             }
             catch (Exception ex)
